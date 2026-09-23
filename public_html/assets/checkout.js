@@ -1,0 +1,9 @@
+(function(){
+const $=id=>document.getElementById(id),digits=v=>(v||'').replace(/\D/g,'');
+function doc(v){const d=digits(v).slice(0,14);if(d.length<=11)return d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');return d.replace(/(\d{2})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1/$2').replace(/(\d{4})(\d{1,2})$/,'$1-$2');}
+function phone(v){const d=digits(v).slice(0,11);return d.length<=10?d.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{4})(\d)/,'$1-$2'):d.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');}
+function cep(v){return digits(v).slice(0,8).replace(/(\d{5})(\d)/,'$1-$2');}
+function cpf(v){const d=digits(v);if(d.length!==11||/^([0-9])\1+$/.test(d))return false;let s=0;for(let i=0;i<9;i++)s+=+d[i]*(10-i);let x=(s*10)%11;if(x===10)x=0;if(x!==+d[9])return false;s=0;for(let i=0;i<10;i++)s+=+d[i]*(11-i);x=(s*10)%11;if(x===10)x=0;return x===+d[10];}
+function cnpj(v){const d=digits(v);if(d.length!==14||/^([0-9])\1+$/.test(d))return false;const calc=n=>{let p=n-5,s=0;for(let i=0;i<n;i++){s+=+d[i]*p--;if(p<2)p=9;}const r=s%11;return r<2?0:11-r};return calc(12)===+d[12]&&calc(13)===+d[13];}
+const f=$('checkout-form'),d=$('cpf_cnpj'),p=$('phone'),c=$('postal_code'),u=$('state');if(d)d.oninput=()=>d.value=doc(d.value);if(p)p.oninput=()=>p.value=phone(p.value);if(c)c.oninput=()=>c.value=cep(c.value);if(u)u.oninput=()=>u.value=u.value.replace(/[^a-z]/gi,'').slice(0,2).toUpperCase();if(f)f.onsubmit=e=>{if(!cpf(d.value)&&!cnpj(d.value)){e.preventDefault();alert('Informe um CPF ou CNPJ válido.');d.focus();}else if(digits(p.value).length<10){e.preventDefault();alert('Informe um celular válido com DDD.');p.focus();}else if(digits(c.value).length!==8){e.preventDefault();alert('Informe um CEP válido.');c.focus();}else if(u.value.length!==2){e.preventDefault();alert('Informe a UF com duas letras.');u.focus();}};
+})();
