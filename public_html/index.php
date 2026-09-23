@@ -6,6 +6,7 @@ session_start();
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'];
 if ($path === '/health') json_out(['ok'=>true,'app'=>'checkout-360bh']);
+if (str_starts_with($path, '/admin')) require __DIR__.'/admin-ui.php';
 if ($path === '/api/v1/payments' && $method === 'POST') {
     $service=service_from_request(); $in=request_json(); foreach(['name','email','amount_cents','idempotency_key'] as $field) if(!isset($in[$field])||$in[$field]==='') json_out(['error'=>$field.' Ã© obrigatÃ³rio'],422);
     $pdo=db(); $q=$pdo->prepare('SELECT * FROM payment_intents WHERE idempotency_key=?'); $q->execute([$in['idempotency_key']]); if($old=$q->fetch()) json_out(['id'=>$old['public_id'],'status'=>$old['status'],'checkout_url'=>$old['checkout_url']]);
